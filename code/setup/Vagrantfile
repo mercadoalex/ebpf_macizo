@@ -1,0 +1,94 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+#
+# Vagrantfile para "eBPF: Macizo y Conciso"
+# Provisiona una VM Ubuntu con kernel 6.1 LTS y todas las herramientas BPF necesarias.
+#
+# Uso:
+#   vagrant up
+#   vagrant ssh
+#   cd /vagrant/code
+#
+
+Vagrant.configure("2") do |config|
+  config.vm.box = "ubuntu/jammy64"
+  config.vm.hostname = "ebpf-lab"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.name = "ebpf-macizo-lab"
+    vb.memory = 4096
+    vb.cpus = 2
+  end
+
+  # Carpeta compartida: el repo del libro queda accesible dentro de la VM
+  config.vm.synced_folder "../..", "/vagrant"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    set -e
+
+    export DEBIAN_FRONTEND=noninteractive
+
+    echo "=== [1/6] Actualizando paquetes base ==="
+    apt-get update -qq
+    apt-get upgrade -y -qq
+
+    echo "=== [2/6] Instalando kernel 6.1 LTS (linux-oem-22.04c) ==="
+    apt-get install -y -qq linux-image-6.1.0-1036-oem linux-headers-6.1.0-1036-oem || {
+      # Fallback: instalar el HWE kernel más reciente disponible
+      echo "Kernel 6.1 OEM no disponible, instalando HWE..."
+      apt-get install -y -qq linux-image-generic-hwe-22.04 linux-headers-generic-hwe-22.04
+    }
+
+    echo "=== [3/6] Instalando clang/LLVM y herramientas de compilación ==="
+    apt-get install -y -qq \
+      clang \
+      llvm \
+      libelf-dev \
+      libbpf-dev \
+      linux-tools-common \
+      linux-tools-generic \
+      build-essential \
+      pkg-config \
+      make \
+      gcc-multilib
+
+    echo "=== [4/6] Instalando bpftool ==="
+    # bpftool viene con linux-tools del kernel instalado
+    apt-get install -y -qq linux-tools-$(uname -r) 2>/dev/null || {
+      echo "linux-tools para kernel actual no disponible, compilando bpftool desde fuentes..."
+      apt-get install -y -qq git
+      git clone --depth 1 https://github.com/libbpf/bpftool.git /tmp/bpftool
+      cd /tmp/bpftool/src
+      make -j$(nproc)
+      make install
+      cd /
+      rm -rf /tmp/bpftool
+    }
+
+    echo "=== [5/6] Instalando Go ==="
+    GO_VERSION="1.22.4"
+    wget -q "https://go.dev/dl/go${GO_VERSION}.linux-amd64.tar.gz" -O /tmp/go.tar.gz
+    rm -rf /usr/local/go
+    tar -C /usr/local -xzf /tmp/go.tar.gz
+    rm /tmp/go.tar.gz
+
+    # Configurar Go en el PATH para todos los usuarios
+    echo 'export PATH=$PATH:/usr/local/go/bin' > /etc/profile.d/go.sh
+    echo 'export GOPATH=$HOME/go' >> /etc/profile.d/go.sh
+    echo 'export PATH=$PATH:$HOME/go/bin' >> /etc/profile.d/go.sh
+
+    echo "=== [6/6] Verificando instalación ==="
+    source /etc/profile.d/go.sh
+    echo "Kernel: $(uname -r)"
+    echo "Clang:  $(clang --version | head -1)"
+    echo "Go:     $(/usr/local/go/bin/go version)"
+    which bpftool && echo "bpftool: $(bpftool version)" || echo "bpftool: se instalará con el nuevo kernel tras reboot"
+
+    echo ""
+    echo "============================================"
+    echo " eBPF Lab listo. Reinicia la VM con:"
+    echo "   vagrant reload"
+    echo " para arrancar con el kernel 6.1"
+    echo "============================================"
+  SHELL
+end

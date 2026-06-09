@@ -1,0 +1,501 @@
+# =============================================================================
+# CI — Validación de código del libro "eBPF: Macizo y Conciso"
+#
+# Este pipeline verifica que todo el código del repositorio compila correctamente:
+# - Programas BPF en C (compilados con clang para target bpf)
+# - Loaders en Go (compilados con go build, usando cilium/ebpf)
+# - Ejemplos en Rust/Aya (solo capítulo 11)
+# - Verificación de Makefiles y scripts
+#
+# Requisitos validados: 5.5 (repositorio de código compilable), 5.6 (entorno reproducible)
+# =============================================================================
+
+name: Validar Código del Libro
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'code/**'
+      - '.github/workflows/validate-code.yml'
+  pull_request:
+    branches: [main, master]
+    paths:
+      - 'code/**'
+      - '.github/workflows/validate-code.yml'
+  # Permitir ejecución manual para validación ad-hoc
+  workflow_dispatch:
+
+# Cancelar ejecuciones anteriores del mismo branch para ahorrar recursos
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# =============================================================================
+# Job 1: Compilar todos los programas BPF (C → bytecode BPF con clang)
+# =============================================================================
+jobs:
+  compilar-bpf:
+    name: "Compilar programas BPF (C)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar toolchain BPF
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang \
+            llvm \
+            libelf-dev \
+            libbpf-dev \
+            linux-headers-$(uname -r) \
+            build-essential \
+            gcc-multilib
+
+      - name: Compilar todos los archivos .bpf.c
+        run: |
+          # Buscar todos los archivos BPF en el directorio de código
+          BPF_FILES=$(find code/ -name "*.bpf.c" 2>/dev/null || true)
+
+          if [ -z "$BPF_FILES" ]; then
+            echo "⚠️  No se encontraron archivos .bpf.c — el directorio de código puede estar vacío aún."
+            echo "    Esto es normal en las primeras etapas de escritura del libro."
+            exit 0
+          fi
+
+          echo "📋 Archivos BPF encontrados:"
+          echo "$BPF_FILES"
+          echo ""
+
+          ERRORES=0
+          COMPILADOS=0
+
+          for archivo in $BPF_FILES; do
+            echo "🔨 Compilando: $archivo"
+            SALIDA="${archivo%.bpf.c}.bpf.o"
+
+            if clang -target bpf \
+                -D__TARGET_ARCH_x86 \
+                -I/usr/include/x86_64-linux-gnu \
+                -Wall -Werror \
+                -O2 -g \
+                -c "$archivo" \
+                -o "$SALIDA"; then
+              echo "   ✓ OK → $SALIDA"
+              ((COMPILADOS++))
+            else
+              echo "   ✗ ERROR compilando $archivo"
+              ((ERRORES++))
+            fi
+          done
+
+          echo ""
+          echo "═══════════════════════════════════"
+          echo " Resumen BPF: $COMPILADOS compilados, $ERRORES errores"
+          echo "═══════════════════════════════════"
+
+          if [ $ERRORES -gt 0 ]; then
+            exit 1
+          fi
+
+  # =============================================================================
+  # Job 2: Compilar todos los loaders en Go (cilium/ebpf)
+  # =============================================================================
+  compilar-go:
+    name: "Compilar loaders Go (cilium/ebpf)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache: true
+          cache-dependency-path: '**/go.sum'
+
+      - name: Instalar dependencias de compilación BPF (para go generate)
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang \
+            llvm \
+            libelf-dev \
+            libbpf-dev \
+            linux-headers-$(uname -r) \
+            gcc-multilib
+
+      - name: Compilar todos los módulos Go
+        run: |
+          # Buscar todos los directorios con go.mod
+          GO_MODS=$(find code/ -name "go.mod" 2>/dev/null || true)
+
+          if [ -z "$GO_MODS" ]; then
+            echo "⚠️  No se encontraron módulos Go (go.mod) — el directorio puede estar vacío aún."
+            echo "    Esto es normal en las primeras etapas de escritura del libro."
+            exit 0
+          fi
+
+          echo "📋 Módulos Go encontrados:"
+          echo "$GO_MODS"
+          echo ""
+
+          ERRORES=0
+          COMPILADOS=0
+
+          for modfile in $GO_MODS; do
+            MODDIR=$(dirname "$modfile")
+            echo "🔨 Compilando módulo Go en: $MODDIR"
+
+            cd "$MODDIR"
+
+            # Descargar dependencias
+            if ! go mod download 2>&1; then
+              echo "   ⚠️  Error descargando dependencias, intentando go mod tidy..."
+              go mod tidy 2>&1 || true
+            fi
+
+            # Si hay go generate (para generar código BPF con bpf2go)
+            if grep -rq "//go:generate" *.go 2>/dev/null; then
+              echo "   → Ejecutando go generate..."
+              go generate ./... 2>&1 || true
+            fi
+
+            # Compilar
+            if go build ./...; then
+              echo "   ✓ OK"
+              ((COMPILADOS++))
+            else
+              echo "   ✗ ERROR compilando $MODDIR"
+              ((ERRORES++))
+            fi
+
+            cd "$GITHUB_WORKSPACE"
+          done
+
+          echo ""
+          echo "═══════════════════════════════════"
+          echo " Resumen Go: $COMPILADOS compilados, $ERRORES errores"
+          echo "═══════════════════════════════════"
+
+          if [ $ERRORES -gt 0 ]; then
+            exit 1
+          fi
+
+  # =============================================================================
+  # Job 3: Compilar ejemplos en Rust/Aya (solo capítulo 11)
+  # =============================================================================
+  compilar-rust:
+    name: "Compilar Rust/Aya (cap11)"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Verificar si existe código Rust para capítulo 11
+        id: check-rust
+        run: |
+          # Buscar Cargo.toml en el directorio del capítulo 11
+          RUST_DIR=$(find code/ -path "*cap11*" -name "Cargo.toml" 2>/dev/null | head -1 || true)
+
+          if [ -z "$RUST_DIR" ]; then
+            echo "⚠️  No se encontró Cargo.toml en cap11 — el código Rust puede no existir aún."
+            echo "    Esto es normal en las primeras etapas de escritura del libro."
+            echo "rust_exists=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "rust_exists=true" >> "$GITHUB_OUTPUT"
+            echo "rust_dir=$(dirname $RUST_DIR)" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Instalar Rust toolchain
+        if: steps.check-rust.outputs.rust_exists == 'true'
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-unknown-linux-gnu
+
+      - name: Instalar dependencias del sistema para Aya
+        if: steps.check-rust.outputs.rust_exists == 'true'
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libelf-dev \
+            linux-headers-$(uname -r) \
+            build-essential \
+            pkg-config
+
+      - name: Compilar proyecto Rust (Aya)
+        if: steps.check-rust.outputs.rust_exists == 'true'
+        run: |
+          echo "🔨 Compilando Rust en: ${{ steps.check-rust.outputs.rust_dir }}"
+          cd "${{ steps.check-rust.outputs.rust_dir }}"
+          cargo build 2>&1
+          echo "   ✓ cargo build OK"
+
+      - name: Verificar con cargo check (análisis estático sin generar binarios)
+        if: steps.check-rust.outputs.rust_exists == 'true'
+        run: |
+          cd "${{ steps.check-rust.outputs.rust_dir }}"
+          cargo check 2>&1
+          echo "   ✓ cargo check OK"
+
+  # =============================================================================
+  # Job 4: Verificar Makefiles y scripts
+  # =============================================================================
+  verificar-makefiles:
+    name: "Verificar Makefiles y scripts"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar herramientas necesarias
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang \
+            llvm \
+            libelf-dev \
+            libbpf-dev \
+            linux-headers-$(uname -r) \
+            build-essential \
+            gcc-multilib \
+            make \
+            shellcheck
+
+      - name: Instalar Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Verificar Makefiles (make all)
+        run: |
+          # Buscar Makefiles en el directorio de código
+          MAKEFILES=$(find code/ -name "Makefile" 2>/dev/null || true)
+
+          if [ -z "$MAKEFILES" ]; then
+            echo "⚠️  No se encontraron Makefiles — esto es normal en etapas tempranas."
+            exit 0
+          fi
+
+          echo "📋 Makefiles encontrados:"
+          echo "$MAKEFILES"
+          echo ""
+
+          ERRORES=0
+
+          for makefile in $MAKEFILES; do
+            MAKEDIR=$(dirname "$makefile")
+            echo "🔨 Ejecutando make en: $MAKEDIR"
+
+            if make -C "$MAKEDIR" all 2>&1; then
+              echo "   ✓ make all OK"
+            else
+              # Intentar target por defecto si 'all' no existe
+              if make -C "$MAKEDIR" 2>&1; then
+                echo "   ✓ make (default) OK"
+              else
+                echo "   ✗ ERROR en make para $MAKEDIR"
+                ((ERRORES++))
+              fi
+            fi
+          done
+
+          if [ $ERRORES -gt 0 ]; then
+            echo ""
+            echo "✗ Hubo $ERRORES Makefiles con errores"
+            exit 1
+          fi
+
+      - name: Verificar scripts con shellcheck
+        run: |
+          # Buscar scripts .sh en el directorio de código
+          SCRIPTS=$(find code/ -name "*.sh" 2>/dev/null || true)
+
+          if [ -z "$SCRIPTS" ]; then
+            echo "⚠️  No se encontraron scripts .sh"
+            exit 0
+          fi
+
+          echo "📋 Scripts encontrados:"
+          echo "$SCRIPTS"
+          echo ""
+
+          ERRORES=0
+
+          for script in $SCRIPTS; do
+            echo "🔍 Verificando: $script"
+            if shellcheck "$script" 2>&1; then
+              echo "   ✓ shellcheck OK"
+            else
+              echo "   ⚠️  shellcheck reportó problemas en $script"
+              ((ERRORES++))
+            fi
+          done
+
+          # shellcheck es informativo — no falla el build por warnings
+          if [ $ERRORES -gt 0 ]; then
+            echo ""
+            echo "⚠️  shellcheck encontró problemas en $ERRORES scripts (no bloquea el build)"
+          fi
+
+      - name: Verificar outputs documentados de Makefiles
+        run: |
+          # Verificar que los Makefiles generan los archivos .bpf.o esperados
+          MAKEFILES=$(find code/ -name "Makefile" 2>/dev/null || true)
+
+          if [ -z "$MAKEFILES" ]; then
+            exit 0
+          fi
+
+          echo "🔍 Verificando outputs generados..."
+          ERRORES=0
+
+          for makefile in $MAKEFILES; do
+            MAKEDIR=$(dirname "$makefile")
+
+            # Verificar que los .bpf.o esperados existen después de make
+            BPF_SOURCES=$(find "$MAKEDIR" -name "*.bpf.c" 2>/dev/null || true)
+            for src in $BPF_SOURCES; do
+              EXPECTED="${src%.bpf.c}.bpf.o"
+              if [ -f "$EXPECTED" ]; then
+                echo "   ✓ Output generado: $EXPECTED"
+              else
+                echo "   ✗ Output faltante: $EXPECTED (esperado de $src)"
+                ((ERRORES++))
+              fi
+            done
+          done
+
+          if [ $ERRORES -gt 0 ]; then
+            echo ""
+            echo "✗ Hay $ERRORES outputs faltantes"
+            exit 1
+          fi
+
+  # =============================================================================
+  # Job 5: Verificación BPF con el verifier (BPF_PROG_TEST_RUN)
+  # Requiere kernel con soporte BPF — usa ubuntu-latest con permisos privilegiados.
+  # NOTA: En GitHub Actions el kernel del runner soporta BPF básico.
+  # Para verificación completa en producción, usar una VM dedicada.
+  # =============================================================================
+  verificar-bpf:
+    name: "Verificar programas BPF (verifier)"
+    runs-on: ubuntu-latest
+    # Este job depende de que la compilación pase primero
+    needs: [compilar-bpf, compilar-go]
+
+    steps:
+      - name: Checkout del repositorio
+        uses: actions/checkout@v4
+
+      - name: Instalar herramientas BPF
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            clang \
+            llvm \
+            libelf-dev \
+            libbpf-dev \
+            linux-headers-$(uname -r) \
+            linux-tools-$(uname -r) \
+            linux-tools-common \
+            build-essential \
+            gcc-multilib
+
+      - name: Verificar versión del kernel del runner
+        run: |
+          echo "Kernel del runner: $(uname -r)"
+          echo "Verificando soporte BPF..."
+
+          # Verificar que el kernel soporta BPF
+          if [ -f "/boot/config-$(uname -r)" ]; then
+            grep -E "CONFIG_BPF|CONFIG_DEBUG_INFO_BTF" "/boot/config-$(uname -r)" || true
+          fi
+
+          # Verificar bpftool
+          if command -v bpftool &>/dev/null; then
+            bpftool version
+          else
+            echo "⚠️  bpftool no disponible — se usará verificación por carga directa"
+          fi
+
+      - name: Compilar programas BPF para verificación
+        run: |
+          BPF_FILES=$(find code/ -name "*.bpf.c" 2>/dev/null || true)
+
+          if [ -z "$BPF_FILES" ]; then
+            echo "⚠️  No hay programas BPF para verificar"
+            exit 0
+          fi
+
+          for archivo in $BPF_FILES; do
+            SALIDA="${archivo%.bpf.c}.bpf.o"
+            clang -target bpf \
+              -D__TARGET_ARCH_x86 \
+              -I/usr/include/x86_64-linux-gnu \
+              -O2 -g \
+              -c "$archivo" \
+              -o "$SALIDA" 2>&1 || true
+          done
+
+      - name: Verificar con bpftool prog load (dry-run del verifier)
+        run: |
+          # Intentar cargar cada programa BPF para que pase por el verifier del kernel
+          BPF_OBJS=$(find code/ -name "*.bpf.o" 2>/dev/null || true)
+
+          if [ -z "$BPF_OBJS" ]; then
+            echo "⚠️  No hay objetos BPF (.bpf.o) para verificar"
+            exit 0
+          fi
+
+          echo "🔍 Verificando programas BPF contra el verifier del kernel..."
+          echo "   Kernel: $(uname -r)"
+          echo ""
+
+          VERIFICADOS=0
+          ERRORES=0
+          SKIP=0
+
+          for obj in $BPF_OBJS; do
+            echo "📄 Verificando: $obj"
+
+            # Intentar cargar con bpftool para validar contra el verifier
+            # Usamos 'bpftool prog load' que ejecuta el verifier sin ejecutar el programa
+            if command -v bpftool &>/dev/null; then
+              # bpftool prog load carga el programa (pasa por verifier)
+              # pinning en /sys/fs/bpf/ para poder descargar después
+              PIN_PATH="/sys/fs/bpf/test_$(basename ${obj%.bpf.o})"
+
+              if sudo bpftool prog load "$obj" "$PIN_PATH" 2>&1; then
+                echo "   ✓ Verifier PASS"
+                # Limpiar — descargar el programa
+                sudo rm -f "$PIN_PATH" 2>/dev/null || true
+                ((VERIFICADOS++))
+              else
+                echo "   ✗ Verifier REJECT (ver log arriba)"
+                ((ERRORES++))
+              fi
+            else
+              echo "   ⏭️  bpftool no disponible, skip verificación"
+              ((SKIP++))
+            fi
+          done
+
+          echo ""
+          echo "═══════════════════════════════════"
+          echo " Resumen verifier: $VERIFICADOS OK, $ERRORES rechazados, $SKIP omitidos"
+          echo "═══════════════════════════════════"
+
+          if [ $ERRORES -gt 0 ]; then
+            echo ""
+            echo "💀 Hay programas que no pasan el verifier del kernel."
+            echo "   Revisa los errores arriba y consulta el Apéndice D (Troubleshooting del verifier)."
+            exit 1
+          fi

@@ -1,0 +1,21 @@
+[book]
+title = "eBPF: Macizo y Conciso"
+description = "Desde tu primer hook hasta el sonido del metal contra el hueso del kernel"
+authors = ["Alex Market"]
+language = "es"
+src = "src"
+
+[build]
+build-dir = "book"
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
+
+[output.html]
+additional-css = ["theme/custom.css"]
+
+[output.html.fold]
+enable = true
+level = 0
+
+[output.pdf]
