@@ -1,0 +1,33 @@
+# mdBook build output
+book/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Vagrant
+.vagrant/
+
+# Go
+code/**/go/loader
+code/**/go/main
+
+# BPF compiled objects
+*.bpf.o
+
+# Rust
+code/**/rust/target/
+
+# Node (if any tooling)
+node_modules/
+
+# Portadas (excepto la seleccionada)
+portadas/*
+!portadas/propuesta07.png
