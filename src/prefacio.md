@@ -72,12 +72,17 @@ code/
 
 ## Cómo montar el laboratorio
 
-Necesitas un kernel Linux >= 5.10 con BTF habilitado. Tienes dos opciones:
+eBPF es una tecnología del kernel **Linux**. No existe en macOS ni en Windows. Necesitas un entorno Linux real para ejecutar los programas de este libro.
 
-1. **Vagrant** (recomendado): `cd code/setup && vagrant up` — te da una VM Ubuntu con todo instalado
-2. **Docker**: `cd code/setup && docker build -t ebpf-lab .` — para compilación, aunque no puedes cargar programas BPF dentro del container sin privilegios
+Tienes varias opciones dependiendo de tu sistema:
 
-Ejecuta `code/setup/check-env.sh` para verificar que tienes todo listo antes de arrancar.
+- **Linux nativo** (kernel ≥ 5.15): Instala las herramientas y listo. La mejor experiencia.
+- **macOS (Apple Silicon o Intel)**: Usa **Lima** (`brew install lima`) para correr una VM Linux nativa, o levanta una instancia en la nube (AWS, GCP, Hetzner — desde $0.01/hora).
+- **Windows**: WSL2 con kernel reciente, o instancia en la nube.
+
+> ☠️ Ni VirtualBox ni Docker Desktop te sirven para ejecutar programas BPF en Mac. VirtualBox no corre en Apple Silicon, y Docker Desktop usa una VM interna con kernel limitado. Necesitas una VM Linux real (Lima) o una máquina Linux de verdad (nube).
+
+Ejecuta `code/setup/check-env.sh` para verificar que tienes todo listo antes de arrancar. Los detalles completos están en el Capítulo 3.
 
 ## Cómo leer este libro
 

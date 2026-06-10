@@ -1,0 +1,86 @@
+# Lima configuration for "eBPF: Macizo y Conciso"
+# 
+# Uso:
+#   limactl start --name=ebpf lima.yaml
+#   limactl shell ebpf
+#
+# Requisitos:
+#   brew install lima
+#
+# Esto levanta una VM Ubuntu 22.04 con kernel reciente y todas las
+# herramientas BPF necesarias para el libro.
+
+images:
+  - location: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-amd64.img"
+    arch: "x86_64"
+  - location: "https://cloud-images.ubuntu.com/releases/22.04/release/ubuntu-22.04-server-cloudimg-arm64.img"
+    arch: "aarch64"
+
+cpus: 2
+memory: "4GiB"
+disk: "20GiB"
+
+# Montar el directorio home para acceder al repo del libro
+mounts:
+  - location: "~"
+    writable: true
+
+# Provisionar herramientas BPF
+provision:
+  - mode: system
+    script: |
+      #!/bin/bash
+      set -eux -o pipefail
+
+      export DEBIAN_FRONTEND=noninteractive
+
+      echo "=== [1/4] Actualizando paquetes ==="
+      apt-get update -qq
+      apt-get upgrade -y -qq
+
+      echo "=== [2/4] Instalando toolchain BPF ==="
+      apt-get install -y -qq \
+        clang \
+        llvm \
+        libelf-dev \
+        libbpf-dev \
+        linux-headers-$(uname -r) \
+        linux-tools-common \
+        linux-tools-generic \
+        build-essential \
+        pkg-config \
+        make \
+        gcc-multilib \
+        git
+
+      # bpftool
+      apt-get install -y -qq linux-tools-$(uname -r) 2>/dev/null || {
+        echo "Compilando bpftool desde fuentes..."
+        git clone --depth 1 https://github.com/libbpf/bpftool.git /tmp/bpftool
+        cd /tmp/bpftool/src && make -j$(nproc) && make install
+        rm -rf /tmp/bpftool
+      }
+
+      echo "=== [3/4] Instalando Go ==="
+      GO_VERSION="1.22.4"
+      ARCH=$(dpkg --print-architecture)
+      wget -q "https://go.dev/dl/go${GO_VERSION}.linux-${ARCH}.tar.gz" -O /tmp/go.tar.gz
+      rm -rf /usr/local/go
+      tar -C /usr/local -xzf /tmp/go.tar.gz
+      rm /tmp/go.tar.gz
+
+      cat > /etc/profile.d/go.sh << 'EOF'
+      export PATH=$PATH:/usr/local/go/bin
+      export GOPATH=$HOME/go
+      export PATH=$PATH:$HOME/go/bin
+      EOF
+
+      echo "=== [4/4] Verificación ==="
+      source /etc/profile.d/go.sh
+      echo "Kernel: $(uname -r)"
+      echo "Clang:  $(clang --version | head -1)"
+      echo "Go:     $(/usr/local/go/bin/go version)"
+      which bpftool && echo "bpftool: $(bpftool version)" || echo "bpftool: OK"
+
+      echo ""
+      echo "🤘 Lab de eBPF listo."
