@@ -96,6 +96,8 @@ CONFIG_BPF_EVENTS=y
 CONFIG_DEBUG_INFO_BTF=y
 ```
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de grep CONFIG_BPF en el config del kernel con todas las flags en =y] -->
+
 Si ves `=y` en las primeras cinco, estás listo para este capítulo y los siguientes. `CONFIG_DEBUG_INFO_BTF` es un bonus que necesitarás a partir del Capítulo 15 (BTF y CO-RE) — si tu kernel no lo tiene ahora, no te preocupes todavía.
 
 > ⚙️ **Nota técnica**: Las distribuciones modernas (Ubuntu 22.04+, Fedora 38+, Debian 12+) incluyen todas estas flags habilitadas por defecto. Si usas el kernel de tu distribución sin modificar, probablemente ya las tienes. El problema aparece con kernels custom o distribuciones minimalistas.
@@ -443,6 +445,8 @@ sudo ./minimal
    Presiona Ctrl+C para salir...
 ```
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la ejecución exitosa de sudo ./minimal con el mensaje de programa BPF cargado] -->
+
 Si ves eso, tu toolchain completo funciona. El programa BPF:
 - Se compiló de C a bytecode BPF ✓
 - Se empaquetó en un ELF ✓
@@ -680,6 +684,8 @@ Si todo pasa, ves:
 🤘 Entorno perfecto. Estás listo para eBPF.
 ```
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la ejecución completa de check-env.sh con todos los checks pasando en verde] -->
+
 Si algo falla, el script te dice exactamente qué instalar y cómo.
 
 ---
@@ -886,6 +892,8 @@ sudo bpftool prog list
 
 Ahí está tu programa: `minimal_prog`, tipo `tracepoint`, con licencia GPL, 16 bytes de bytecode traducidos a 28 bytes de código JIT nativo.
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de sudo bpftool prog list con el programa minimal_prog cargado, tipo tracepoint, con su tag y tamaño de bytecode] -->
+
 ### Paso 11: Limpiar
 
 Presiona `Ctrl+C` en la terminal donde corre el programa:
@@ -909,6 +917,8 @@ Si completaste todos los pasos, confirmaste que:
 - ✅ El programa se adjunta a un tracepoint
 - ✅ `bpftool` puede ver el programa cargado
 - ✅ Al salir, el programa se limpia correctamente
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la secuencia completa: ejecución de sudo ./minimal, el mensaje de éxito, y luego Ctrl+C con el mensaje de limpieza] -->
 
 **Conexión con lo que viene:** Este esqueleto vacío es la base sobre la que construimos todo. En el Capítulo 4 le vamos a agregar lógica real — un Hello World que imprime información cada vez que se ejecuta un programa nuevo en el sistema.
 

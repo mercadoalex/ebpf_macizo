@@ -149,6 +149,8 @@ El título de este capítulo no es hipérbole. BPF empezó como un filtro de paq
 
 No es una moda. No es un experimento. Es la plataforma de extensión del kernel Linux, punto.
 
+<!-- [INSERTA IMAGEN AQUI: Diagrama visual tipo infografía mostrando la evolución de BPF: desde el filtro de paquetes simple de 1992 hasta la máquina virtual multi-propósito de 2024, con los hitos clave y logos de proyectos del ecosistema] -->
+
 ---
 
 ## El modelo de ejecución — Cómo corre código en el kernel sin matarlo
@@ -265,6 +267,8 @@ El JIT está habilitado por defecto en kernels modernos. Puedes verificarlo:
 cat /proc/sys/net/core/bpf_jit_enable
 # 1 = habilitado, 2 = habilitado con debug output
 ```
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando cat /proc/sys/net/core/bpf_jit_enable con el valor 1 indicando que JIT está habilitado] -->
 
 ### Paso 6: Adjuntar (attach) — Engancharse al kernel
 
@@ -542,6 +546,8 @@ using libbpf v1.x
 features: libbfd, libbpf_strict, skeletons
 ```
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de bpftool version con versión y features disponibles] -->
+
 Si no lo tienes instalado:
 
 ```bash
@@ -585,6 +591,8 @@ sudo bpftool prog list
 	xlated 2048B  jitted 1240B  memlock 4096B
 	btf_id 150
 ```
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de sudo bpftool prog list con los programas eBPF ya cargados en el sistema por systemd y otros servicios] -->
 
 ### Paso 3: Entender qué estás viendo
 

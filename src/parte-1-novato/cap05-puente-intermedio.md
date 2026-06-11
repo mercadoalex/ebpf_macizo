@@ -219,6 +219,8 @@ Marca cada punto que puedas explicar sin consultar el libro. Sé honesto — est
 
 **16-18 puntos marcados:** Estás sólido. Avanza al Capítulo 6 con confianza.
 
+<!-- [INSERTA IMAGEN AQUI: Diagrama visual tipo roadmap mostrando el camino del libro desde Novato (caps 1-5) hasta Intermedio (caps 6-13) y Ninja, con las dependencias entre conceptos] -->
+
 **12-15 puntos:** Tienes gaps. Identifica qué capítulos necesitas repasar y dedícales 30 minutos antes de continuar.
 
 **Menos de 12:** Vuelve a los capítulos 1-4. No es una derrota — es inversión. El Nivel Intermedio asume que todo esto es segunda naturaleza.

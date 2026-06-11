@@ -40,6 +40,8 @@ La respuesta es corta: **porque tu código corre en el kernel**.
 
 No en un sandbox. No en una VM con garbage collector. No en un container. En el *kernel*. El mismo código que maneja tu red, tu filesystem, tu memoria. Si tu programa BPF tiene un bug — un puntero inválido, un loop infinito, un acceso fuera de bounds — no obtienes un segfault amigable. Obtienes un **kernel panic**. O peor: corrupción silenciosa de memoria que te explota tres días después.
 
+<!-- [INSERTA IMAGEN AQUI: Diagrama visual mostrando la diferencia entre un módulo del kernel (sin verificación, puede crashear todo) versus un programa eBPF (pasa por el verifier antes de ejecutar, garantiza seguridad)] -->
+
 ### El contrato del kernel
 
 El kernel de Linux tiene un contrato no negociable con el hardware y con user space:
@@ -359,6 +361,8 @@ if (!val)
     return 0;
 val->field = 123;  // Ahora el verifier sabe que val != NULL
 ```
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando un error típico del verifier "R0 invalid mem access map_value_or_null" con el log de instrucciones del verifier señalando la línea problemática] -->
 
 **Frecuencia:** Altísima. Es probablemente el error #1 que vas a encontrar al empezar.
 
@@ -947,6 +951,8 @@ llvm-objdump -d program.o
 
 Te muestra las instrucciones BPF. Útil para correlacionar el error del verifier (que referencia números de instrucción) con tu código C.
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de llvm-objdump -d program.o con el bytecode BPF desensamblado y los números de instrucción que el verifier referencia en sus errores] -->
+
 **3. `bpftool prog dump`:**
 
 Si necesitas ver el bytecode de un programa ya cargado:
@@ -1042,6 +1048,8 @@ char _license[] SEC("license") = "GPL";
 - [ ] Corregir cada error sin cambiar la funcionalidad del programa
 - [ ] El programa corregido se carga sin errores con `bpftool prog load` o via cilium/ebpf
 - [ ] El programa efectivamente cuenta paquetes TCP por IP de origen
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la carga exitosa del programa corregido con bpftool prog load o cilium/ebpf, sin errores del verifier] -->
 
 ### Pistas
 

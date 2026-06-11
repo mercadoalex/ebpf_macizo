@@ -20,3 +20,12 @@ El título es "eBPF: Macizo y Conciso" con subtítulo "Desde tu primer hook hast
 - El tono es directo, irreverente, punk pero honesto — sin relleno corporativo
 - La audiencia son devs y gente técnica, ya sea novata o experta
 - El libro va de novato a ninja en 3 niveles de progresión
+
+## Imágenes y capturas de pantalla
+
+- Cada capítulo debe incluir placeholders para capturas de pantalla del código compilándose y ejecutándose
+- Usar el formato: `<!-- [INSERTA IMAGEN AQUI: descripción de qué muestra la captura] -->`
+- Las imágenes reales las proporcionará el autor cuando ejecute cada ejercicio
+- Los placeholders deben ir después de cada bloque de "Resultado esperado" en los ejercicios
+- También agregar placeholders donde un diagrama visual (no Mermaid) ayudaría a la comprensión
+- Los diagramas Mermaid ya se renderizan automáticamente — no necesitan placeholder

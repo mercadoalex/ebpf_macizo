@@ -117,7 +117,7 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio intermedio: contador de syscalls por proceso con hash map (esqueleto + criterios)
     - _Requirements: 3.1, 3.4, 3.5, 7.1, 7.2, 7.3_
 
-  - [ ] 6.2 Crear código del Capítulo 6
+  - [x] 6.2 Crear código del Capítulo 6
     - Escribir ejemplos de cada tipo de map: BPF en C + loader/consumer en Go
     - Crear esqueleto del ejercicio (`code/cap06-maps/ejercicio/esqueleto/`) con la estructura base y TODOs
     - Crear solución de referencia (`code/cap06-maps/ejercicio/solucion/`) completa y compilable
@@ -130,7 +130,7 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio intermedio: diagnosticar y corregir 3 errores del verifier (pistas sin solución)
     - _Requirements: 3.1, 3.3, 3.5, 7.1, 7.3_
 
-  - [ ] 6.4 Crear código del Capítulo 7
+  - [x] 6.4 Crear código del Capítulo 7
     - Escribir programas rotos (`code/cap07-verifier/ejemplos/broken/`) que fallan el verifier de 3 formas distintas
     - Escribir versiones corregidas (`code/cap07-verifier/ejemplos/fixed/`)
     - Crear esqueleto y solución del ejercicio
@@ -143,7 +143,7 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio intermedio: medir latencia de syscalls con bpf_ktime_get_ns (esqueleto)
     - _Requirements: 3.1, 3.4, 3.5, 7.1_
 
-  - [ ] 6.6 Crear código del Capítulo 8
+  - [x] 6.6 Crear código del Capítulo 8
     - Escribir ejemplos de uso de helpers principales: BPF en C + loader en Go
     - Crear esqueleto del ejercicio de latencia y solución de referencia
     - _Requirements: 3.2, 5.3, 5.5_
@@ -160,7 +160,7 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Crear esqueleto del filesystem tracer y solución de referencia
     - _Requirements: 3.2, 5.3, 5.5_
 
-  - [ ] 6.9 Escribir Capítulo 10: XDP y TC — Networking a velocidad del kernel
+  - [x] 6.9 Escribir Capítulo 10: XDP y TC — Networking a velocidad del kernel
     - Escribir las 5 secciones: XDP, acciones XDP, TC, parseo de paquetes, XDP vs TC
     - Incluir diagramas (posición en network stack, flujo con decisiones XDP)
     - Incluir analogía (portero de discoteca) y advertencia (pointer fuera del paquete)

@@ -13,7 +13,7 @@
 
 package main
 
-//go:generate go run github.com/cilium/ebpf/cmd/bpf2go -target amd64 helpers ../bpf/context_helpers.bpf.c
+//go:generate go run github.com/cilium/ebpf/cmd/bpf2go -target amd64 helpers context_helpers.bpf.c
 
 import (
 	"bytes"

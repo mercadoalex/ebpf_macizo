@@ -53,6 +53,8 @@ Las helper functions son funciones **proporcionadas por el kernel** que tus prog
 
 No puedes llamar funciones arbitrarias del kernel. No puedes invocar `printk` (la versión real del kernel). No puedes llamar `kmalloc`. Solo puedes usar las helpers que el kernel explícitamente exporta para programas BPF.
 
+<!-- [INSERTA IMAGEN AQUI: Diagrama visual mostrando un programa BPF dentro de una jaula/sandbox con flechas saliendo solo hacia las helper functions permitidas, mientras las funciones del kernel prohibidas están marcadas con X] -->
+
 ### La mecánica por debajo
 
 Cuando escribes esto en tu programa BPF:
@@ -781,6 +783,8 @@ La forma reserve+submit es preferida porque:
 
 **Recomendación**: Si tu kernel es 5.8+, usa ring buffer. Siempre. Es más simple, más eficiente, y más fácil de consumir desde user space.
 
+<!-- [INSERTA IMAGEN AQUI: Diagrama visual comparando perf buffer (múltiples buffers por CPU, polling individual) vs ring buffer (un buffer compartido FIFO, un solo consumer), mostrando el flujo de datos desde el programa BPF hasta user space] -->
+
 ### El consumer en Go (ring buffer)
 
 ```go
@@ -1090,6 +1094,8 @@ func main() {
 - [ ] La latencia reportada está en un rango razonable (típicamente 1-100 µs para operaciones locales)
 - [ ] Los eventos muestran el PID correcto y el nombre del proceso
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando el programa de latencia de openat ejecutándose mientras se corren comandos cat y ls en otra terminal, con las mediciones de latencia visibles] -->
+
 ### Pistas
 
 1. El TID se obtiene con `bpf_get_current_pid_tgid() & 0xFFFFFFFF` (los 32 bits bajos). El PID (para mostrar) se obtiene con `>> 32` (los 32 bits altos).
@@ -1116,6 +1122,8 @@ PID      COMM             LATENCIA
 1235     cat              15 µs
 ...
 ```
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida del programa de medición de latencia con eventos de openat mostrando PID, nombre del proceso y latencia en microsegundos] -->
 
 Si la latencia es 0 µs para todo, probablemente estás leyendo mal el timestamp de entrada (verifica que estás usando el TID como clave, no el PID).
 

@@ -458,6 +458,8 @@ Ahora ejecuta algunos comandos (ls, cat, whoami) y verás:
           whoami-5434    [003] d..1  2345.890123: bpf_trace_printk: Hello from PID 5434 (whoami)
 ```
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de sudo cat /sys/kernel/debug/tracing/trace_pipe con líneas de bpf_trace_printk mostrando PIDs y nombres de procesos interceptados en tiempo real] -->
+
 Cada línea es tu programa BPF reportando un evento. Estás *viendo* los procesos nacer en tiempo real.
 
 ---
@@ -771,6 +773,8 @@ sudo ./hello
    Presiona Ctrl+C para detener y limpiar.
 ```
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la ejecución de sudo ./hello con el mensaje de bienvenida e instrucciones para observar trace_pipe] -->
+
 **Terminal 2 — Observar la salida:**
 
 ```bash
@@ -794,6 +798,8 @@ En la Terminal 2 (trace_pipe) deberías ver algo como:
           whoami-6790    [001] d..1  3456.234567: bpf_trace_printk: execve: PID=6790 COMM=whoami
              cat-6791    [000] d..1  3456.345678: bpf_trace_printk: execve: PID=6791 COMM=cat
 ```
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando trace_pipe con múltiples líneas de execve interceptados mientras se ejecutan comandos como ls, whoami y cat] -->
 
 Cada línea es un execve interceptado por tu programa BPF. Estás viendo procesos nacer en tiempo real.
 
@@ -825,6 +831,8 @@ Esto confirma que tu programa está cargado en el kernel:
 - Licencia: `gpl`
 - Tamaño: 112 bytes de bytecode, 89 bytes de código JIT nativo
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando sudo bpftool prog list con el programa hello_world cargado, confirmando tipo tracepoint y tamaño de bytecode/JIT] -->
+
 ### Paso 10: Limpiar
 
 En la Terminal 1, presiona `Ctrl+C`:
@@ -851,6 +859,8 @@ Si completaste todos los pasos, confirmaste los criterios de éxito:
 - ✅ **Produce salida en trace_pipe** — ves las líneas con PID y COMM cada vez que un proceso hace execve
 
 **Felicidades.** Acabas de escribir tu primer programa eBPF funcional. Desde aquí, todo es escalar la complejidad — pero el ciclo fundamental (escribir → compilar → cargar → adjuntar → observar) ya lo dominas.
+
+<!-- [INSERTA IMAGEN AQUI: Captura mostrando las dos terminales lado a lado: una con sudo ./hello corriendo y la otra con trace_pipe mostrando eventos interceptados en tiempo real] -->
 
 ---
 

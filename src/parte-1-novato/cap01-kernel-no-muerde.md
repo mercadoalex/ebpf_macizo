@@ -362,6 +362,8 @@ strace --version
 strace -- version 5.x (o superior)
 ```
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de strace --version con la versión instalada] -->
+
 Si no lo tienes instalado:
 
 ```bash
@@ -400,6 +402,8 @@ write(1, "archivo1.txt  archivo2.log\n", 28) = 28
 close(1)                                = 0
 exit_group(0)                           = ?
 ```
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida completa de strace ls /tmp con las syscalls execve, brk, mmap, openat, getdents64, write, y exit_group] -->
 
 **Lo que estás viendo:** Cada línea es una syscall. El formato es:
 
@@ -456,6 +460,8 @@ strace -c ls /tmp
 
 42 syscalls para listar un directorio. Tu CPU hizo 42 viajes de Ring 3 a Ring 0 y de vuelta. Ahora imagina un servidor web manejando miles de requests por segundo.
 
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando la salida de strace -c ls /tmp con la tabla de estadísticas de syscalls y el total de llamadas] -->
+
 ### Paso 5: Tracear un programa con red
 
 Esto es más interesante. Veamos las syscalls de red:
@@ -501,6 +507,8 @@ Si completaste todos los pasos, ya puedes:
 - ✅ Filtrar por tipo de syscall (`-e trace=...`)
 - ✅ Obtener estadísticas de uso (`-c`)
 - ✅ Adjuntar a un proceso ya existente (`-p PID`)
+
+<!-- [INSERTA IMAGEN AQUI: Captura de terminal mostrando strace adjuntado a un proceso en ejecución con sudo strace -p PID, interceptando syscalls en tiempo real] -->
 
 **Conexión con eBPF:** Lo que `strace` hace desde user space (interceptar syscalls usando `ptrace`, que es lento y tiene overhead), eBPF lo puede hacer desde kernel space — con cero overhead perceptible y sin necesidad de privilegios de root sobre el proceso tracedo. En el Capítulo 4 vamos a construir algo similar pero con eBPF.
 
