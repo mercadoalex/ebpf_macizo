@@ -48,7 +48,7 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Crear `src/mapa-progresion.md` con diagrama Mermaid del mapa visual de progresión (18 capítulos, dependencias, niveles)
     - _Requirements: 1.2, 1.4_
 
-- [ ] 3. Checkpoint — Verificar setup
+- [~] 3. Checkpoint — Verificar setup
   - Asegurar que `mdbook build` compila sin errores, `mdbook serve` renderiza el CSS custom correctamente, y la CI pasa en verde. Preguntar al usuario si hay dudas.
 
 - [x] 4. Escribir Parte I — Nivel Novato (Capítulos 1-5)
@@ -106,10 +106,10 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Declarar prerrequisitos del lector: línea de comandos Linux + programación básica en C
     - _Requirements: 1.2, 2.4, 2.6_
 
-- [ ] 5. Checkpoint — Parte I completa
+- [~] 5. Checkpoint — Parte I completa
   - Verificar que todos los capítulos 1-5 tienen los elementos de la plantilla (términos, objetivos, prerrequisitos, diagrama, advertencia, ejercicio, resumen, recursos). Verificar que el código del Cap 3 y Cap 4 compila. Preguntar al usuario si hay dudas.
 
-- [ ] 6. Escribir Parte II — Nivel Intermedio (Capítulos 6-13)
+- [x] 6. Escribir Parte II — Nivel Intermedio (Capítulos 6-13)
   - [x] 6.1 Escribir Capítulo 6: Maps — La memoria compartida
     - Escribir las 6 secciones: qué son maps, hash maps, array/per-CPU, ring buffer, CRUD, patrones de uso
     - Incluir diagramas (memoria de un map, flujo ring buffer)
@@ -148,14 +148,14 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Crear esqueleto del ejercicio de latencia y solución de referencia
     - _Requirements: 3.2, 5.3, 5.5_
 
-  - [ ] 6.7 Escribir Capítulo 9: Kprobes y Tracepoints — Escuchando al kernel
+  - [x] 6.7 Escribir Capítulo 9: Kprobes y Tracepoints — Escuchando al kernel
     - Escribir las 5 secciones: kprobes, kretprobes, tracepoints, fentry/fexit, patrones prácticos
     - Incluir diagramas (kprobe vs kretprobe, flujo de tracepoint)
     - Incluir analogía (breakpoints del kernel) y advertencia (kprobes inestables entre versiones)
     - Escribir ejercicio intermedio: tracer de filesystem operations (esqueleto + criterios)
     - _Requirements: 3.1, 3.3, 3.5, 7.1, 7.2, 7.3_
 
-  - [ ] 6.8 Crear código del Capítulo 9
+  - [x] 6.8 Crear código del Capítulo 9
     - Escribir ejemplos de kprobes/tracepoints: BPF en C + loader en Go
     - Crear esqueleto del filesystem tracer y solución de referencia
     - _Requirements: 3.2, 5.3, 5.5_
@@ -167,43 +167,43 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio intermedio: firewall XDP básico (esqueleto del parseo, lector implementa lógica)
     - _Requirements: 3.1, 3.3, 3.5, 7.1, 7.2, 7.3_
 
-  - [ ] 6.10 Crear código del Capítulo 10
+  - [x] 6.10 Crear código del Capítulo 10
     - Escribir ejemplos XDP y TC: BPF en C + loader en Go
     - Crear esqueleto del firewall XDP y solución de referencia
     - _Requirements: 3.2, 5.3, 5.5_
 
-  - [ ] 6.11 Escribir Capítulo 11: Frameworks en acción — cilium/ebpf, Aya, y el ecosistema
+  - [x] 6.11 Escribir Capítulo 11: Frameworks en acción — cilium/ebpf, Aya, y el ecosistema
     - Escribir las 6 secciones: por qué Go es el principal, programa de referencia en Go, mismo programa en Aya (Rust), mención breve de libbpf/BCC, comparativa, guía de decisión
     - Incluir diagramas de arquitectura de cilium/ebpf y Aya
     - Incluir advertencia (no hay framework "mejor")
     - Escribir ejercicio intermedio: extender programa de referencia en Go (esqueleto + criterios)
     - _Requirements: 3.1, 3.2, 3.5, 7.1_
 
-  - [ ] 6.12 Crear código del Capítulo 11
+  - [x] 6.12 Crear código del Capítulo 11
     - Escribir el programa de referencia (contador XDP por protocolo) en Go (cilium/ebpf) — implementación principal
     - Escribir el mismo programa en Rust (Aya) — como comparación
     - Crear esqueleto y solución del ejercicio de extensión (conteo por IP destino) en Go
     - _Requirements: 3.2, 5.3, 5.5_
 
-  - [ ] 6.13 Escribir Capítulo 12: User space ↔ Kernel — La conversación
+  - [x] 6.13 Escribir Capítulo 12: User space ↔ Kernel — La conversación
     - Escribir las 5 secciones: el problema, perf events, ring buffer, maps compartidos, patrones de diseño
     - Incluir diagramas (perf vs ring buffer, flujo end-to-end)
     - Incluir analogía (tubos neumáticos) y advertencia (back-pressure)
     - Escribir ejercicio intermedio: event logger con ring buffer (esqueleto BPF, lector implementa consumer)
     - _Requirements: 3.1, 3.4, 3.5, 7.1, 7.2, 7.3_
 
-  - [ ] 6.14 Crear código del Capítulo 12
+  - [x] 6.14 Crear código del Capítulo 12
     - Escribir ejemplos de perf events y ring buffer: BPF en C + consumer en Go
     - Crear esqueleto del event logger y solución de referencia
     - _Requirements: 3.2, 5.3, 5.5_
 
-  - [ ] 6.15 Escribir Capítulo 13: De intermedio a ninja — El puente
+  - [x] 6.15 Escribir Capítulo 13: De intermedio a ninja — El puente
     - Escribir las 3 secciones: lo que ya dominas, las paredes que vas a golpear, el siguiente nivel
     - Incluir diagrama (mapa de conceptos completo hasta este punto)
     - Escribir ejercicio integrador: tool de observabilidad (kprobes + maps + ring buffer + consumer)
     - _Requirements: 1.2, 1.5, 3.4, 8.5_
 
-  - [ ] 6.16 Crear código del ejercicio integrador del Capítulo 13
+  - [x] 6.16 Crear código del ejercicio integrador del Capítulo 13
     - Crear esqueleto del mini-proyecto integrador: BPF en C + Go para user space
     - Crear solución de referencia completa en Go (cilium/ebpf)
     - _Requirements: 5.3, 5.5_
@@ -212,11 +212,11 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir `src/parte-2-intermedio/intro.md` con prerrequisitos (completar Nivel Novato), objetivos, resumen de capítulos
     - _Requirements: 1.2, 3.4_
 
-- [ ] 7. Checkpoint — Parte II completa
+- [~] 7. Checkpoint — Parte II completa
   - Verificar todos los capítulos 6-13 con la checklist de completitud. Verificar que todo el código de ejemplos y ejercicios compila. Verificar progresión de terminología (no se usa término antes de introducirlo). Preguntar al usuario si hay dudas.
 
 - [ ] 8. Escribir Parte III — Nivel Ninja (Capítulos 14-18)
-  - [ ] 8.1 Escribir Capítulo 14: Tail calls, function calls y composición
+  - [x] 8.1 Escribir Capítulo 14: Tail calls, function calls y composición
     - Escribir las 5 secciones: complejidad, tail calls, BPF-to-BPF calls, combinación, limitaciones
     - Incluir diagramas (pipeline tail calls, comparación tail call vs function call)
     - Incluir advertencia (límite de 33 tail calls) y análisis de limitaciones/trade-offs
@@ -224,12 +224,12 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Integrar conceptos: Maps (Cap 6) y Verifier (Cap 7)
     - _Requirements: 4.1, 4.3, 4.5, 7.1, 7.3_
 
-  - [ ] 8.2 Crear código del Capítulo 14
+  - [x] 8.2 Crear código del Capítulo 14
     - Escribir ejemplos de tail calls y function calls: BPF en C + loader en Go
     - Crear solución de referencia del classifier en Go
     - _Requirements: 4.6, 5.4, 5.5_
 
-  - [ ] 8.3 Escribir Capítulo 15: BTF y CO-RE — Escribe una vez, corre en todos lados
+  - [x] 8.3 Escribir Capítulo 15: BTF y CO-RE — Escribe una vez, corre en todos lados
     - Escribir las 6 secciones: infierno de versiones, BTF, CO-RE, vmlinux.h, relocations, limitaciones
     - Incluir diagramas (con vs sin CO-RE, flujo de relocations)
     - Incluir advertencia (BTF requiere kernel con CONFIG_DEBUG_INFO_BTF)
@@ -237,12 +237,12 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio ninja: programa portable entre kernels 5.10/5.15/6.1 (solo requisitos)
     - _Requirements: 4.1, 4.3, 4.5, 7.1_
 
-  - [ ] 8.4 Crear código del Capítulo 15
+  - [x] 8.4 Crear código del Capítulo 15
     - Escribir ejemplos de BTF/CO-RE: BPF en C + loader en Go
     - Crear solución de referencia del ejercicio de portabilidad
     - _Requirements: 4.6, 5.4, 5.5_
 
-  - [ ] 8.5 Escribir Capítulo 16: Networking avanzado — XDP en producción
+  - [x] 8.5 Escribir Capítulo 16: Networking avanzado — XDP en producción
     - Escribir las 6 secciones: XDP en prod, load balancing, DDoS mitigation, redirect/devmap, AF_XDP, caso Katran
     - Incluir diagramas (arquitectura load balancer XDP, flujo XDP redirect)
     - Incluir 3 casos de estudio: Katran (Meta), Cilium, Cloudflare
@@ -250,12 +250,12 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio ninja: load balancer L4 (<5µs/paquete, 100k conexiones)
     - _Requirements: 4.1, 4.2, 4.3, 4.5, 7.1_
 
-  - [ ] 8.6 Crear código del Capítulo 16
+  - [x] 8.6 Crear código del Capítulo 16
     - Escribir ejemplos de XDP avanzado (load balancing, redirect): BPF en C + loader en Go
     - Crear solución de referencia del load balancer L4
     - _Requirements: 4.6, 5.4, 5.5_
 
-  - [ ] 8.7 Escribir Capítulo 17: Seguridad y observabilidad — eBPF en las trincheras
+  - [x] 8.7 Escribir Capítulo 17: Seguridad y observabilidad — eBPF en las trincheras
     - Escribir las 6 secciones: seguridad, LSM hooks, detección anómala, observabilidad a escala, modelo de seguridad, caso Falco/Tetragon
     - Incluir diagramas (runtime security, pipeline observabilidad)
     - Incluir 3 casos de estudio: Falco, Tetragon, Pixie
@@ -263,12 +263,12 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio ninja: detección de container escapes (LSM + syscall monitoring + alerting)
     - _Requirements: 4.1, 4.2, 4.3, 4.5, 7.1_
 
-  - [ ] 8.8 Crear código del Capítulo 17
+  - [x] 8.8 Crear código del Capítulo 17
     - Escribir ejemplos de LSM hooks y syscall monitoring: BPF en C + loader en Go
     - Crear solución de referencia del sistema de detección
     - _Requirements: 4.6, 5.4, 5.5_
 
-  - [ ] 8.9 Escribir Capítulo 18: Optimización y el camino del contribuidor
+  - [x] 8.9 Escribir Capítulo 18: Optimización y el camino del contribuidor
     - Escribir las 6 secciones: profiling, optimización, testing BPF, contribuir al kernel, ecosistema 2024+, siguiente paso
     - Incluir diagramas (pipeline profiling, mapa del ecosistema)
     - Incluir caso de estudio: revisión de un parche real al subsistema BPF
@@ -276,73 +276,73 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
     - Escribir ejercicio ninja: perfilar y optimizar un ejercicio previo con evidencia medida
     - _Requirements: 4.1, 4.3, 4.5, 7.1_
 
-  - [ ] 8.10 Crear código del Capítulo 18
+  - [x] 8.10 Crear código del Capítulo 18
     - Escribir ejemplos de profiling y optimización (BPF_PROG_TEST_RUN, per-CPU maps, batching)
     - Crear scripts de benchmarking como referencia
     - _Requirements: 4.6, 5.4, 5.5_
 
-  - [ ] 8.11 Escribir introducción de Parte III
+  - [x] 8.11 Escribir introducción de Parte III
     - Escribir `src/parte-3-ninja/intro.md` con prerrequisitos (completar Nivel Intermedio), objetivos, resumen de capítulos
     - _Requirements: 1.2, 4.4_
 
-- [ ] 9. Checkpoint — Parte III completa
+- [~] 9. Checkpoint — Parte III completa
   - Verificar todos los capítulos 14-18 con la checklist. Verificar código compilable. Verificar que cada capítulo integra al menos 2 conceptos de niveles anteriores. Verificar que hay al menos 3 casos de estudio documentados. Preguntar al usuario si hay dudas.
 
-- [ ] 10. Escribir Apéndices
-  - [ ] 10.1 Escribir Apéndice A: Glosario bilingüe
+- [x] 10. Escribir Apéndices
+  - [x] 10.1 Escribir Apéndice A: Glosario bilingüe
     - Compilar todos los términos técnicos introducidos en los 18 capítulos (~80-120 términos)
     - Formato: término inglés, explicación español, referencia al capítulo de introducción
     - Organizar alfabéticamente por término en inglés
     - _Requirements: 6.1, 6.3_
 
-  - [ ] 10.2 Escribir Apéndice B: Referencia rápida de helper functions
+  - [x] 10.2 Escribir Apéndice B: Referencia rápida de helper functions
     - Organizar helpers por tipo de programa (XDP, TC, Kprobes, LSM, universales)
     - Cada entrada: nombre, firma, descripción 1 línea, kernel mínimo requerido
     - _Requirements: 7.5_
 
-  - [ ] 10.3 Escribir Apéndice C: Cheatsheet de tipos de maps
+  - [x] 10.3 Escribir Apéndice C: Cheatsheet de tipos de maps
     - Tabla rápida: tipo de map × características (max entries, per-CPU, user-accessible, etc.)
     - Incluir guía rápida de cuándo usar cada tipo
     - _Requirements: 3.1, 7.5_
 
-  - [ ] 10.4 Escribir Apéndice D: Troubleshooting del verifier
+  - [x] 10.4 Escribir Apéndice D: Troubleshooting del verifier
     - Documentar los 20 errores más comunes del verifier
     - Cada entrada: mensaje exacto, significado, cómo resolverlo, ejemplo antes/después
     - _Requirements: 3.1, 7.3_
 
-  - [ ] 10.5 Escribir Apéndice E: Recursos y comunidad
+  - [x] 10.5 Escribir Apéndice E: Recursos y comunidad
     - Documentación oficial, repositorios clave, conferencias, comunidades, blogs/newsletters
     - Organizar por categoría con descripciones breves
     - _Requirements: 7.4_
 
-- [ ] 11. Checkpoint — Apéndices completos
+- [~] 11. Checkpoint — Apéndices completos
   - Verificar que el glosario contiene todos los términos introducidos en el texto. Verificar que la referencia de helpers cubre lo mencionado en Cap 8. Preguntar al usuario si hay dudas.
 
-- [ ] 12. Revisión editorial y consistencia
-  - [ ] 12.1 Revisión de progresión terminológica
+- [x] 12. Revisión editorial y consistencia
+  - [x] 12.1 Revisión de progresión terminológica
     - Verificar que ningún término técnico se usa antes de ser introducido (o tiene nota de referencia adelantada)
     - Verificar formato consistente de primera mención: `**término** (pronunciación) — explicación`
     - Generar lista maestra de términos con capítulo de introducción
     - _Requirements: 1.3, 1.5, 6.2, 6.3, 6.5, 6.6_
 
-  - [ ] 12.2 Revisión de completitud de capítulos
+  - [x] 12.2 Revisión de completitud de capítulos
     - Verificar cada capítulo contra la checklist: título, cita, términos, objetivos, prerrequisitos, secciones (≥2), código, diagrama (≥1), advertencia (≥1), ejercicio, resumen (3-7 puntos), recursos (≥2)
     - Verificar que la distribución de páginas cumple: Novato 20-30%, Intermedio 40-50%, Ninja 25-35%
     - _Requirements: 8.1, 8.2, 8.3_
 
-  - [ ] 12.3 Revisión de tono y estilo
+  - [x] 12.3 Revisión de tono y estilo
     - Verificar tono consistente: directo, irreverente, punk pero honesto, sin relleno corporativo
     - Verificar que cada capítulo abre con cita/frase acorde al estilo
     - Verificar que las analogías son cotidianas y no forzadas
     - _Requirements: 7.2, 7.3_
 
-  - [ ] 12.4 Verificación final del código
+  - [x] 12.4 Verificación final del código
     - Ejecutar CI completa: todos los programas BPF compilan (C), todos los loaders compilan (Go), capítulo 11 compila (Rust)
     - Verificar que todos los ejercicios tienen esqueleto Y solución
     - Verificar que las soluciones producen el output documentado en el texto
     - _Requirements: 5.2, 5.3, 5.5_
 
-- [ ] 13. Checkpoint final — Libro listo para beta readers
+- [~] 13. Checkpoint final — Libro listo para beta readers
   - Verificar build completo de mdBook sin errores. Verificar CI verde. Verificar que el libro es navegable y los recuadros se renderizan bien. Preguntar al usuario si hay dudas.
 
 ## Notes

@@ -1,0 +1,8 @@
+[workspace]
+members = ["xdp-proto-counter", "xdp-proto-counter-ebpf"]
+
+[workspace.dependencies]
+aya = "0.12"
+aya-log = "0.2"
+aya-bpf = "0.1"
+aya-log-ebpf = "0.1"

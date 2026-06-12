@@ -1,64 +1,83 @@
-# Ejercicio Capítulo 10: Firewall XDP Básico
+# Ejercicio — Capítulo 10: Firewall XDP con Blocklist Dinámica
 
-## Nivel: Intermedio
+📋 **Nivel:** Intermedio
+📚 **Conceptos previos:** Hash maps (Cap 6), bounds checking (Cap 7), helpers de maps (Cap 8)
+🖥️ **Entorno:** Lab con Docker/Vagrant del Capítulo 3
+🎯 **Problema:** Implementar un firewall XDP que bloquee tráfico entrante de IPs específicas usando un hash map como blocklist
 
-## Problema
+## Contexto
 
-Implementar un firewall XDP que bloquee tráfico entrante de IPs específicas
-usando un hash map como blocklist. Las IPs se configuran desde user space y
-pueden agregarse/removerse en caliente.
+Tienes un servidor que recibe tráfico de diversas fuentes. Quieres bloquear IPs específicas **antes** de que los paquetes lleguen al network stack. El blocklist se configura desde user space (puedes agregar y remover IPs en caliente).
 
-## Estructura
+## Lo que vas a hacer
+
+1. **Completar el programa BPF** (`esqueleto/bpf/xdp_firewall.bpf.c`):
+   - TODO 1: Obtener la IP de origen del paquete
+   - TODO 2: Buscar la IP en el map "blocklist"
+   - TODO 3: Si está bloqueada, incrementar contadores y retornar XDP_DROP
+   - TODO 4: Si no está bloqueada, incrementar contador de passed y retornar XDP_PASS
+
+2. **El loader en Go ya está completo** (`esqueleto/go/main.go`):
+   - Carga el programa BPF
+   - Puebla la blocklist con IPs de ejemplo
+   - Adjunta XDP a la interfaz
+   - Muestra stats cada 2 segundos
+
+## Estructura de los maps
 
 ```
-esqueleto/
-├── bpf/
-│   ├── Makefile
-│   └── xdp_firewall.bpf.c    ← Programa BPF con parseo listo, falta la lógica
-└── go/
-    ├── go.mod
-    ├── main.go                ← Loader en Go (completo)
-    └── xdp_firewall.bpf.c    ← Copia para go generate
+┌─────────────────────────────────────────┐
+│ Hash Map: blocklist                     │
+│                                         │
+│  Key (__u32)       │  Value (__u64)     │
+│ ──────────────────┼──────────────       │
+│  192.168.1.100    │  42 (drops)        │
+│  10.0.0.50        │  128 (drops)       │
+│  ...              │  ...               │
+└─────────────────────────────────────────┘
 
-solucion/
-├── bpf/
-│   ├── Makefile
-│   └── xdp_firewall.bpf.c    ← Solución completa
-└── go/
-    ├── go.mod
-    ├── main.go                ← Loader con stats por IP
-    └── xdp_firewall.bpf.c    ← Solución completa
+┌─────────────────────────────────────────┐
+│ Array Map: stats                        │
+│                                         │
+│  Index (__u32)  │  Value (__u64)        │
+│ ───────────────┼──────────────          │
+│  0 (passed)    │  15234                │
+│  1 (dropped)   │  892                  │
+└─────────────────────────────────────────┘
 ```
 
-## Qué debes implementar
+## Criterios de éxito
 
-En `esqueleto/bpf/xdp_firewall.bpf.c`, busca los comentarios `// TODO:` en el PASO 3.
-Debes:
+- [ ] El programa se carga sin errores del verifier
+- [ ] Se adjunta a la interfaz de red exitosamente
+- [ ] Paquetes de IPs en la blocklist son descartados (no llegan a la app)
+- [ ] Paquetes de IPs no bloqueadas pasan normalmente
+- [ ] Los contadores se actualizan correctamente (puedes verificar con el ticker de stats)
+- [ ] Puedes agregar/remover IPs en caliente desde user space
 
-1. Obtener la IP de origen del paquete (`ip->saddr`)
-2. Buscar la IP en el map `blocklist`
-3. Si está: incrementar contadores y retornar `XDP_DROP`
-4. Si no está: incrementar contador de passed y retornar `XDP_PASS`
+## Pistas
 
-## Conceptos requeridos
+1. La IP de origen está en `ip->saddr` — ya es un `__u32` en network byte order. No necesitas convertir antes de buscar en el map.
+2. Para buscar en el map: `bpf_map_lookup_elem(&blocklist, &src_ip)`. Si retorna non-NULL, la IP está bloqueada.
+3. Para incrementar contadores atómicamente, usa `__sync_fetch_and_add(pointer, 1)`.
+4. No olvides que `bpf_map_lookup_elem` puede retornar NULL — el verifier te obliga a checkear antes de derreferenciar.
 
-- Maps tipo hash (Capítulo 6)
-- `bpf_map_lookup_elem` y `__sync_fetch_and_add` (Capítulo 8)
-- Bounds checking (Capítulo 7)
-
-## Compilar y ejecutar
+## Caso de prueba
 
 ```bash
-cd esqueleto/go
-go generate
-go build -o firewall
+# Terminal 1: Ejecutar el firewall
 sudo ./firewall
-```
 
-## Verificar
-
-```bash
-# En otra terminal, hacer ping desde una IP bloqueada
+# Terminal 2: Probar con ping desde la IP bloqueada
+# (si la IP de tu máquina está en la blocklist)
 ping <IP_del_servidor>
-# Resultado esperado: 100% packet loss si la IP de origen está en la blocklist
+# Resultado esperado: 100% packet loss
+
+# Terminal 3: Ver las stats
+# Resultado esperado: el contador de "dropped" incrementa
 ```
+
+## Si te atoras
+
+Revisa la solución completa en `solucion/`. Pero intenta primero — la lógica del
+programa BPF son ~15 líneas y usa patrones que ya conoces de los Capítulos 6 y 8.

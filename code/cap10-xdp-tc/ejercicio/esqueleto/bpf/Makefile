@@ -1,12 +1,28 @@
-CLANG ?= clang
-CFLAGS := -O2 -g -Wall -target bpf
+# =============================================================================
+# Makefile — Compilación del ejercicio XDP Firewall (Capítulo 10)
+#
+# Uso:
+#   make          Compila xdp_firewall.bpf.c → xdp_firewall.bpf.o
+#   make clean    Elimina archivos generados
+# =============================================================================
+
+CLANG  ?= clang
+CFLAGS := -O2 -target bpf -g -Wall -c
+
+ARCH := $(shell uname -m | sed 's/x86_64/x86/' | sed 's/aarch64/arm64/')
+CFLAGS += -D__TARGET_ARCH_$(ARCH)
+
+BPF_SRC := xdp_firewall.bpf.c
+BPF_OBJ := xdp_firewall.bpf.o
 
 .PHONY: all clean
 
-all: xdp_firewall.bpf.o
+all: $(BPF_OBJ)
 
-xdp_firewall.bpf.o: xdp_firewall.bpf.c
-	$(CLANG) $(CFLAGS) -c $< -o $@
+$(BPF_OBJ): $(BPF_SRC)
+	$(CLANG) $(CFLAGS) $< -o $@
+	@echo "✓ Compilado: $< → $@"
 
 clean:
-	rm -f *.o
+	rm -f $(BPF_OBJ)
+	@echo "✓ Limpieza completada"

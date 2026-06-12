@@ -1,0 +1,12 @@
+[package]
+name = "xdp-proto-counter-ebpf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+aya-bpf = { version = "0.1", features = [] }
+aya-log-ebpf = "0.1"
+
+[[bin]]
+name = "xdp-proto-counter"
+path = "src/main.rs"

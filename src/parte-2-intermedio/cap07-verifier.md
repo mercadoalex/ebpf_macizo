@@ -553,7 +553,7 @@ program is too complex (exceeded complexity limit)
 - Loops con bounds muy altos combinados con condicionales internos
 - Código generado por macros que se expande demasiado
 
-**Fix:** Simplifica la lógica, usa tail calls para dividir el programa, o reduce bounds de loops:
+**Fix:** Simplifica la lógica, usa tail calls (ver Capítulo 14) para dividir el programa, o reduce bounds de loops:
 
 ```c
 // ANTES: un monstruo monolítico
