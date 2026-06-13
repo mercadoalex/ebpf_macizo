@@ -48,3 +48,4 @@
 - [Apéndice C: Cheatsheet de tipos de maps](apendices/tipos-maps.md)
 - [Apéndice D: Troubleshooting del verifier](apendices/troubleshooting-verifier.md)
 - [Apéndice E: Recursos y comunidad](apendices/recursos.md)
+- [Apéndice F: eBPF en Kubernetes — Guía de navegación](apendices/ebpf-kubernetes.md)
