@@ -52,6 +52,18 @@ Todo el libro usa un solo stack para que no pierdas foco:
 
 No vas a estar saltando entre lenguajes cada dos capítulos. Un stack, un flujo, una forma de pensar.
 
+## Qué problemas resuelve eBPF hoy
+
+Antes de sumergirte en el código, esto es lo que eBPF está resolviendo en producción ahora mismo — no en un paper, no en un prototipo:
+
+- **Networking**: Load balancers que procesan 10M+ paquetes/segundo por core (Katran/Meta, Cilium). Reemplazan iptables, IPVS, y kube-proxy con overhead 10-20x menor.
+- **Observabilidad**: Captura de métricas, traces y logs sin modificar aplicaciones ni agregar SDKs (Pixie, Hubble). El kernel ya tiene los datos — eBPF los extrae sin copias innecesarias.
+- **Seguridad runtime**: Detección y bloqueo de amenazas dentro del kernel, en nanosegundos (Falco, Tetragon). No esperas a que un log llegue a un SIEM — la decisión se toma en el punto de ejecución.
+- **Profiling**: Flamegraphs de CPU, memoria, y off-CPU sin instrumentar el código ni reiniciar procesos (continuous profiling a la Parca/Grafana Pyroscope).
+- **Service mesh sin sidecars**: Procesamiento L7 (HTTP, gRPC) en el kernel sin un proxy por pod (Cilium Service Mesh). Menos recursos, menos latencia, menos complejidad operacional.
+
+Todo esto corre en producción en Meta, Google, Cloudflare, Netflix, y miles de empresas más. No es tecnología experimental — es infraestructura crítica.
+
 ## El repositorio de código
 
 Todo el código de este libro vive en un repositorio complementario. Cada capítulo tiene su directorio con:
@@ -88,13 +100,27 @@ Ejecuta `code/setup/check-env.sh` para verificar que tienes todo listo antes de 
 
 Lee en orden. No es broma. Cada capítulo construye sobre el anterior. Si saltas al capítulo de XDP sin entender maps, vas a sufrir innecesariamente.
 
-El libro tiene tres niveles:
+El libro tiene tres niveles de progresión:
 
-- **Novato (Caps 1-5):** Entiendes el kernel, eBPF, y escribes tu primer programa
-- **Intermedio (Caps 6-13):** Dominas maps, verifier, helpers, networking, y frameworks
-- **Ninja (Caps 14-18):** Tail calls, CO-RE, XDP en producción, seguridad, optimización
+### Parte I — Novato (Capítulos 1-5)
 
-Entre cada nivel hay un capítulo puente que consolida lo aprendido y te prepara para lo que viene.
+Arrancas desde cero. Entiendes qué es el kernel, de dónde viene eBPF, montas tu laboratorio, y escribes tu primer programa que se carga al kernel y produce output. Al terminar esta parte ya tienes un programa eBPF corriendo — no solo leíste sobre uno.
+
+### Parte II — Intermedio (Capítulos 6-13)
+
+Aquí se pone serio. Dominas maps (la memoria compartida entre kernel y user space), aprendes a pelear con el verifier sin morir, usas kprobes y tracepoints para escuchar al kernel, escribes programas XDP que tocan paquetes de red, y diseñas la comunicación entre tu código BPF y tu aplicación Go. Al terminar esta parte puedes construir herramientas de observabilidad y networking reales.
+
+### Parte III — Ninja (Capítulos 14-18)
+
+El nivel donde los problemas de producción viven. Compones programas con tail calls, escribes código portable entre kernels distintos con CO-RE, implementas load balancers XDP que procesan millones de paquetes por segundo, construyes sistemas de seguridad runtime con LSM hooks, y aprendes a perfilar y optimizar todo lo anterior. Al terminar esta parte puedes leer y contribuir a proyectos como Cilium, Tetragon o Falco sin sentirte perdido.
+
+### Entre cada nivel
+
+Los capítulos 5 y 13 son "puentes" que consolidan lo aprendido, mapean lo que falta, y te preparan para el salto. No los saltes — son el checkpoint donde verificas que entendiste todo antes de subir de nivel.
+
+### Los apéndices
+
+Material de referencia para cuando estés implementando: glosario bilingüe, cheatsheets de helpers y maps, troubleshooting del verifier, y una guía de eBPF en Kubernetes.
 
 ---
 
