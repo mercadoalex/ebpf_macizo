@@ -124,4 +124,21 @@ Material de referencia para cuando estés implementando: glosario bilingüe, che
 
 ---
 
+## Nuestro compromiso: este libro evoluciona contigo
+
+eBPF no se detiene. Cada ciclo del kernel trae features nuevos, helpers nuevos, y capacidades que no existían cuando escribimos estas páginas. Un libro estático se vuelve obsoleto en dos años. Este no va a ser ese libro.
+
+**Nos comprometemos a mantener "eBPF: Macizo y Conciso" actualizado:**
+
+- Nuevas versiones del contenido conforme el ecosistema evolucione
+- Nuevos ejercicios y ejemplos cuando aparezcan patterns que valga la pena documentar
+- Cobertura de tendencias emergentes (sched_ext, eBPF for Windows, BPF tokens, lo que venga)
+- Correcciones y mejoras basadas en feedback de lectores
+
+**Todas las actualizaciones son gratuitas.** Compraste el libro una vez — recibes cada versión futura sin pagar de nuevo. Sin suscripciones anuales ocultas, sin "edición premium". Una compra, acceso perpetuo a la última versión.
+
+Esto es posible porque el libro es digital-first. No hay inventario de libros impresos que obsoletizar. Cuando actualizamos, tú recibes el update.
+
+---
+
 Suficiente introducción. Pasemos al mapa de progresión y luego — a escribir código.
