@@ -49,3 +49,9 @@
 - [Apéndice D: Troubleshooting del verifier](apendices/troubleshooting-verifier.md)
 - [Apéndice E: Recursos y comunidad](apendices/recursos.md)
 - [Apéndice F: eBPF en Kubernetes — Guía de navegación](apendices/ebpf-kubernetes.md)
+
+---
+
+# Bonus
+
+- [BlazeBPF — Practica eBPF en el navegador](bonus-blazebpf.md)
