@@ -44,17 +44,25 @@ Al activar tu cupón en BlazeBPF, recibes automáticamente el badge **"eBPF: Mac
 
 El badge demuestra que invertiste en aprender eBPF en serio — no que leíste un artículo de 5 minutos. En un ecosistema donde pocas personas dominan esta tecnología, eso tiene peso.
 
-### Badges de nivel (progresión en BlazeBPF)
+## Demuestra tu nivel — Badges por completar ejercicios
 
-Además del badge de lector, BlazeBPF genera badges por nivel conforme completas challenges y labs en la plataforma:
+BlazeBPF ya maneja su propio sistema de badges. Para los lectores de este libro, hay una forma adicional de demostrar que no solo compraste el libro sino que lo trabajaste: **sube el ejercicio integrador de cada nivel a BlazeBPF**.
 
-| Badge | Cómo se obtiene |
-|-------|----------------|
-| 🟢 **Novato eBPF** | Completa los challenges de nivel básico (hello world, maps, helpers) |
-| 🟡 **Intermedio eBPF** | Completa labs de XDP, tracepoints, ring buffers |
-| 🔴 **Ninja eBPF** | Completa challenges avanzados (tail calls, CO-RE, LSM, networking) |
+| Nivel | Ejercicio integrador | Código de validación |
+|-------|---------------------|---------------------|
+| 🟢 **Novato** | Capítulo 5 — Syscall tracer con tracepoints | `MACIZO-NOVATO-2025` |
+| 🟡 **Intermedio** | Capítulo 13 — Process Lifecycle Monitor | `MACIZO-INTER-2025` |
+| 🔴 **Ninja** | Capítulo 18 — Profiling + optimización con evidencia medida | `MACIZO-NINJA-2025` |
 
-Cada badge es compartible y verificable. Tu progresión queda registrada.
+**Cómo funciona:**
+
+1. Completa el ejercicio integrador del nivel correspondiente
+2. Sube tu solución a la sección de ejercicios de BlazeBPF
+3. Incluye el código de validación en tu submission
+4. El equipo de BlazeBPF revisa manualmente tu solución
+5. Si cumple los criterios de éxito del ejercicio → badge desbloqueado
+
+La validación es manual y real. No basta con subir código que compile — tiene que cumplir los criterios de éxito documentados en el capítulo. Esto garantiza que el badge signifique algo.
 
 ---
 
