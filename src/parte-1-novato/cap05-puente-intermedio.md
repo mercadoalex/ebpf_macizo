@@ -176,6 +176,189 @@ Esto es intencional. En el Nivel Novato aprendiste siguiendo instrucciones. En e
 
 ---
 
+## Ejercicio integrador: Syscall Tracer — Tu primera herramienta de observabilidad
+
+📋 **Nivel:** Novato (integración de Capítulos 1-4)
+📚 **Conceptos:** Tracepoints, bpf_trace_printk, loader Go, ciclo completo de un programa eBPF
+🖥️ **Entorno:** Tu laboratorio del Capítulo 3
+
+### El reto
+
+Construir un **syscall tracer** que muestre en tiempo real qué procesos están ejecutando qué syscalls. Es tu primera herramienta de observabilidad — primitiva, pero funcional.
+
+A diferencia del Hello World (que solo registraba `execve`), este tracer va a cubrir múltiples syscalls y mostrar información útil de cada una.
+
+### Requisitos funcionales
+
+Tu tracer debe:
+
+1. **Adjuntarse a 3 tracepoints de syscalls:** `sys_enter_openat` (apertura de archivos), `sys_enter_execve` (ejecución de programas), y `sys_enter_connect` (conexiones de red)
+2. **Imprimir para cada evento:** nombre de la syscall, PID del proceso, y nombre del proceso (`comm`)
+3. **Usar `bpf_trace_printk`** para generar la salida (sí, es debug — pero en este nivel es lo que tenemos)
+4. **Cargarse y adjuntarse desde un loader en Go** usando cilium/ebpf
+5. **Salir limpiamente con Ctrl+C** (signal handling en Go)
+
+### Estructura esperada
+
+```
+code/cap05-puente/ejercicio/
+├── esqueleto/
+│   ├── bpf/
+│   │   ├── syscall_tracer.bpf.c   ← Programa BPF (completar TODOs)
+│   │   └── Makefile
+│   └── go/
+│       ├── main.go                 ← Loader Go (completar TODOs)
+│       ├── go.mod
+│       └── syscall_tracer.bpf.c    ← Copia para go generate
+└── solucion/
+    └── ...                         ← Implementación completa
+```
+
+### Esqueleto BPF (C)
+
+```c
+//go:build ignore
+
+#include <linux/bpf.h>
+#include <bpf/bpf_helpers.h>
+
+// TODO: Programa 1 — Detectar apertura de archivos
+// Adjuntar a: tracepoint/syscalls/sys_enter_openat
+// Imprimir: "OPEN pid=%d comm=%s"
+// Helpers necesarios: bpf_get_current_pid_tgid(), bpf_get_current_comm(), bpf_trace_printk()
+SEC("tracepoint/syscalls/sys_enter_openat")
+int trace_openat(void *ctx) {
+    // TODO: Obtener PID (bpf_get_current_pid_tgid() >> 32)
+    // TODO: Obtener comm (bpf_get_current_comm())
+    // TODO: Imprimir con bpf_trace_printk()
+    return 0;
+}
+
+// TODO: Programa 2 — Detectar ejecución de programas
+// Adjuntar a: tracepoint/syscalls/sys_enter_execve
+// Imprimir: "EXEC pid=%d comm=%s"
+SEC("tracepoint/syscalls/sys_enter_execve")
+int trace_execve(void *ctx) {
+    // TODO: Misma lógica que arriba, cambiando el prefijo a "EXEC"
+    return 0;
+}
+
+// TODO: Programa 3 — Detectar conexiones de red
+// Adjuntar a: tracepoint/syscalls/sys_enter_connect
+// Imprimir: "CONNECT pid=%d comm=%s"
+SEC("tracepoint/syscalls/sys_enter_connect")
+int trace_connect(void *ctx) {
+    // TODO: Misma lógica, prefijo "CONNECT"
+    return 0;
+}
+
+char LICENSE[] SEC("license") = "GPL";
+```
+
+### Esqueleto User Space (Go)
+
+```go
+package main
+
+//go:generate go run github.com/cilium/ebpf/cmd/bpf2go -target amd64 tracer syscall_tracer.bpf.c
+
+import (
+    "fmt"
+    "log"
+    "os"
+    "os/signal"
+    "syscall"
+
+    "github.com/cilium/ebpf/link"
+    "github.com/cilium/ebpf/rlimit"
+)
+
+func main() {
+    // TODO 1: Remover memlock (rlimit.RemoveMemlock())
+
+    // TODO 2: Cargar objetos BPF (loadTracerObjects())
+    //   No olvides defer objs.Close()
+
+    // TODO 3: Adjuntar los 3 programas a sus tracepoints:
+    //   link.Tracepoint("syscalls", "sys_enter_openat", objs.TraceOpenat, nil)
+    //   link.Tracepoint("syscalls", "sys_enter_execve", objs.TraceExecve, nil)
+    //   link.Tracepoint("syscalls", "sys_enter_connect", objs.TraceConnect, nil)
+    //   No olvides defer para cada uno
+
+    // TODO 4: Imprimir instrucciones al usuario
+    fmt.Println("Syscall Tracer activo. Ver output con:")
+    fmt.Println("  sudo cat /sys/kernel/debug/tracing/trace_pipe")
+    fmt.Println("Ctrl+C para salir.")
+
+    // TODO 5: Esperar señal de interrupción
+    sig := make(chan os.Signal, 1)
+    signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+    <-sig
+
+    fmt.Println("\n👋 Tracer detenido.")
+}
+```
+
+### Criterios de éxito
+
+- [ ] Los 3 programas BPF compilan sin errores con clang
+- [ ] Los 3 programas pasan el verifier al cargarse
+- [ ] Se adjuntan correctamente a los 3 tracepoints
+- [ ] Ejecutar `ls /tmp` genera al menos un evento "OPEN" y uno "EXEC" en trace_pipe
+- [ ] Ejecutar `curl google.com` genera un evento "CONNECT"
+- [ ] Cada evento muestra el PID y nombre del proceso correctos
+- [ ] El programa sale limpiamente con Ctrl+C sin dejar hooks colgados
+
+### Validación
+
+```bash
+# Terminal 1: ejecutar el tracer
+sudo ./syscall-tracer
+
+# Terminal 2: leer la salida
+sudo cat /sys/kernel/debug/tracing/trace_pipe
+
+# Terminal 3: generar actividad
+ls /tmp
+cat /etc/hostname
+curl -s google.com > /dev/null
+```
+
+**Resultado esperado en trace_pipe:**
+
+```
+ tracer-1234  [002] .... 5123.456: 0: EXEC pid=5678 comm=ls
+ tracer-1234  [002] .... 5123.457: 0: OPEN pid=5678 comm=ls
+ tracer-1234  [002] .... 5123.458: 0: OPEN pid=5678 comm=ls
+ tracer-1234  [001] .... 5125.100: 0: EXEC pid=5680 comm=cat
+ tracer-1234  [001] .... 5125.101: 0: OPEN pid=5680 comm=cat
+ tracer-1234  [003] .... 5127.200: 0: EXEC pid=5682 comm=curl
+ tracer-1234  [003] .... 5127.201: 0: CONNECT pid=5682 comm=curl
+```
+
+<!-- [INSERTA IMAGEN AQUI: Captura mostrando el syscall tracer corriendo en una terminal y trace_pipe mostrando eventos de OPEN, EXEC y CONNECT en otra terminal] -->
+
+### Pistas
+
+1. `bpf_get_current_pid_tgid()` retorna un `u64` donde los 32 bits superiores son el PID (shift >> 32)
+2. `bpf_get_current_comm()` necesita un buffer de al menos 16 bytes
+3. `bpf_trace_printk()` tiene un límite de 3 argumentos después del format string — planea tus prints con eso en mente
+4. En Go, `loadTracerObjects()` es generado automáticamente por `go generate` — los nombres de los programas se derivan de los nombres de funciones C (TraceOpenat, TraceExecve, TraceConnect)
+5. Si trace_pipe no muestra nada, verifica que no hay otro programa leyendo el mismo buffer
+
+### ¿Por qué este ejercicio importa?
+
+Este tracer, aunque usa `bpf_trace_printk` (que no es producción), demuestra que entiendes:
+
+- **El kernel como fuente de datos** (Cap 1) — estás observando operaciones internas
+- **El modelo eBPF** (Cap 2) — programa C compilado → verifier → hook → output
+- **El toolchain** (Cap 3) — clang, Go, cilium/ebpf trabajando juntos
+- **El ciclo completo** (Cap 4) — escribir, compilar, cargar, adjuntar, observar
+
+Es lo mínimo que un developer debe poder hacer con eBPF. Si puedes construir esto sin ayuda, el Nivel Intermedio no te va a asustar.
+
+---
+
 ## Ejercicio: Auto-evaluación — ¿Estás listo para el siguiente nivel?
 
 📋 **Nivel:** Novato (consolidación)
