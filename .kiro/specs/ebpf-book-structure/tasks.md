@@ -357,6 +357,24 @@ Este plan cubre la escritura completa del libro "eBPF: Macizo y Conciso" usando 
 - Los checkpoints son puntos de revisión humana del contenido
 - Cada tarea de escritura de capítulo incluye TODOS los elementos pedagógicos de la plantilla
 
+### Estrategia de precios
+
+- **LATAM (mercado principal):** $19-25 USD — sweet spot para poder adquisitivo real de devs en la región
+- **España:** $29-35 USD — poder adquisitivo europeo, cero competencia en español
+- **USA/Europa angloparlante:** $39-49 USD — competencia directa con O'Reilly/Manning
+- **Modelo:** Precio sugerido $22 USD, mínimo $15, "supporter" $35 (PPP/paga lo que quieras)
+- **Paquetes:** Solo libro $22 | Libro + BlazeBPF Pro $39 | Equipo (5 licencias) $89
+- **Launch:** 30% descuento primeras 2 semanas ($15 USD) para early adopters
+- **Incluido en el precio:** Actualizaciones de por vida + cupón BlazeBPF 1 año
+- **Plataforma:** Gumroad o Leanpub (soportan PPP y paga lo que quieras)
+
+### Integración BlazeBPF
+
+- Cupón de 1 año incluido con la compra (enviar evidencia a like@blazebpf.com)
+- Badge "eBPF Macizo y Conciso — Reader" al activar cupón
+- Badges por nivel: subir ejercicio integrador (Cap 5, 13, 18) con códigos MACIZO-NOVATO/INTER/NINJA-2025
+- Validación manual de ejercicios por equipo BlazeBPF
+
 ## Task Dependency Graph
 
 ```json
